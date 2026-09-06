@@ -1,8 +1,8 @@
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native"
 import type { RepQuality, SessionSet, SetMeasurement } from "../domain/workout-model"
 import { formatSetTarget } from "../domain/workout-programmes"
-import { WorkoutButton, styles } from "./workout-theme"
+import { WorkoutButton, styles, workoutColors } from "./workout-theme"
 
 function enteredNumber(text: string): number | undefined {
   return text.trim() === "" ? undefined : Number(text)
@@ -30,6 +30,7 @@ function Field({
         autoCorrect={false}
         returnKeyType="done"
         placeholder={numeric ? "Not entered" : "Describe resistance"}
+        placeholderTextColor={workoutColors.muted}
       />
     </View>
   )
@@ -69,10 +70,12 @@ export function WorkoutEntryForm({
   readonly busy: boolean
   readonly onRecord: (measurement: unknown, quality: RepQuality, rir: number | undefined) => void
   readonly onOmit: () => void
-}) {
+}): JSX.Element {
   const { target } = set.prescription
   const previousLoad = previous?._tag === "reps" ? previous.load : undefined
-  const [quantity, setQuantity] = useState(`${target.min}`)
+  const [quantity, setQuantity] = useState(
+    target._tag === "duration" || target._tag === "hold" ? "0" : `${target.min}`,
+  )
   const [weight, setWeight] = useState(
     previous?._tag === "carry"
       ? `${previous.pounds}`
@@ -144,13 +147,13 @@ export function WorkoutEntryForm({
               ? ` · rest ${set.prescription.rest.min}–${set.prescription.rest.max} sec`
               : ""}
           </Text>
-          <Text style={styles.body}>{set.prescription.cue}</Text>
+          {set.prescription.cue !== "" && <Text style={styles.body}>{set.prescription.cue}</Text>}
         </View>
         <View style={styles.card}>
           <Field
             label={
               target._tag === "reps"
-                ? "Actual repetitions"
+                ? "Repetitions"
                 : target._tag === "carry"
                   ? "Actual distance (m)"
                   : "Actual duration (seconds)"
@@ -212,11 +215,6 @@ export function WorkoutEntryForm({
               numeric={false}
             />
           )}
-          <Text style={styles.body}>
-            {previous
-              ? "Last recorded load is prefilled. Check it before saving."
-              : "Targets are prefilled, not measured. Confirm what you actually did."}
-          </Text>
         </View>
         {target._tag === "reps" && (
           <View style={{ gap: 12 }}>

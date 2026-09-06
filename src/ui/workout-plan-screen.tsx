@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, type JSX } from "react"
 import { ScrollView, Text, View } from "react-native"
 import type { ProgrammeId, SetPrescription } from "../domain/workout-model"
 import { formatSetTarget, type WorkoutProgramme } from "../domain/workout-programmes"
@@ -16,7 +16,7 @@ export function WorkoutPlanScreen({
   readonly busy: boolean
   readonly onBack: () => void
   readonly onStart: (programmeId: ProgrammeId, upperBodySets: 2 | 3 | undefined) => void
-}) {
+}): JSX.Element {
   const [upperBodySets, setUpperBodySets] = useState<2 | 3 | undefined>()
   const groups = new Map<string, Array<SetPrescription>>()
   for (const set of programme.sets) {
@@ -74,7 +74,7 @@ export function WorkoutPlanScreen({
                 {count} × {formatSetTarget(set.target)}
                 {set.rest.max > 0 ? ` · ${set.rest.min}–${set.rest.max} sec rest` : ""}
               </Text>
-              <Text style={styles.body}>{set.cue}</Text>
+              {set.cue !== "" && <Text style={styles.body}>{set.cue}</Text>}
             </View>
           )
         })}

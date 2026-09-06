@@ -1,3 +1,4 @@
+import type { JSX } from "react"
 import { Pressable, ScrollView, Text, View } from "react-native"
 import type { ProgrammeId } from "../domain/workout-model"
 import { workoutProgrammes } from "../domain/workout-programmes"
@@ -12,12 +13,12 @@ export function WorkoutWeekScreen({
   readonly hasActiveSession: boolean
   readonly onResume: () => void
   readonly onSelect: (id: ProgrammeId) => void
-}) {
+}): JSX.Element {
   const today = new Date()
   const recoveryDay = [2, 4].includes(today.getDay())
   return (
     <ScrollView contentContainerStyle={styles.page}>
-      <Text style={[styles.heading, { fontSize: 20 }]}>workout</Text>
+      <Text style={[styles.heading, { fontSize: 20 }]}>Exercise Your Demons</Text>
       <View style={{ paddingVertical: 20, gap: 14 }}>
         <Text style={styles.eyebrow}>
           {today.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
@@ -41,9 +42,9 @@ export function WorkoutWeekScreen({
           </Text>
         </View>
       ) : undefined}
-      <View style={styles.row}>
+      <View style={{ gap: 8 }}>
+        <Text style={styles.eyebrow}>Motorsport Strength &amp; Stamina</Text>
         <Text style={styles.heading}>Your week</Text>
-        <Text style={styles.eyebrow}>Strength + stamina</Text>
       </View>
       {workoutProgrammes.map((entry, index) => (
         <Pressable

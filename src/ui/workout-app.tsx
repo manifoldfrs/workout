@@ -1,5 +1,5 @@
 import { Effect } from "effect"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type JSX } from "react"
 import { KeyboardAvoidingView, Platform, Pressable, Text, View } from "react-native"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import { StatusBar } from "expo-status-bar"
@@ -20,7 +20,7 @@ type LoadState =
   | { readonly _tag: "unavailable" }
 
 /** The app boundary owns the runtime lifetime and handles expected errors without exposing payloads. */
-export function WorkoutApp() {
+export function WorkoutApp(): JSX.Element {
   const runtime = useRef<ReturnType<typeof createWorkoutRuntime> | undefined>(undefined)
   const locked = useRef(false)
   const [state, setState] = useState<LoadState>({ _tag: "loading" })
@@ -103,16 +103,6 @@ export function WorkoutApp() {
       setShowSession(true)
     }
   }
-  async function restoreBackup(data: string): Promise<boolean> {
-    if (state._tag !== "ready") return false
-    const expectedRevision = state.journal.revision
-    const journal = await run(
-      Effect.flatMap(WorkoutService, (service) => service.restoreBackup(data, expectedRevision)),
-    )
-    if (!journal) return false
-    setState({ _tag: "ready", journal })
-    return true
-  }
   const journal = state._tag === "ready" ? state.journal : undefined
   const active = journal?.sessions.find((session) => session.state._tag === "active")
   const programme = selected === undefined ? undefined : findWorkoutProgramme(selected)
@@ -164,16 +154,7 @@ export function WorkoutApp() {
       )
     switch (tab) {
       case "history":
-        return (
-          <WorkoutHistoryScreen
-            journal={journal}
-            busy={busy}
-            exportBackup={() =>
-              run(Effect.flatMap(WorkoutService, (service) => service.exportBackup()))
-            }
-            restoreBackup={restoreBackup}
-          />
-        )
+        return <WorkoutHistoryScreen journal={journal} />
       case "review":
         return (
           <WorkoutReviewScreen

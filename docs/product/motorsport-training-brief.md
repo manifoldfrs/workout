@@ -14,6 +14,11 @@ Professional driver preparation inspires the balance of resistance training, cyc
 
 ## Confirmed preferences
 
+- App name: **Exercise Your Demons**. Current programme name: **Motorsport Strength & Stamina**.
+- Duration and neck-hold entry starts at `0`, not the prescribed target. This is an unrecorded draft, never evidence of completed work. Use `Repetitions` consistently for rep fields and visually distinct placeholders for empty resistance inputs.
+- Keep notes concise and exercise-specific. Hide empty notes and remove manual backup/restore controls from History. This UI choice does not authorise deleting existing data.
+- Reviewing fully recorded or deliberately omitted work must offer `End session` without an early-finish reason prompt. Remaining pending work still needs an explicit omission decision.
+
 - Record workouts on the **Apple Watch Ultra 3**, usually in Apple's Workout app as Functional Strength Training or Indoor Cycling. On Wednesday, stop strength recording and start a separate Indoor Cycling recording. Link both to one app session without merging or duplicating the originals.
 - Design for **thumb-first use on the iPhone 15 Pro Max**, including quick logging between sets. This is a mobile app, not a spreadsheet squeezed onto a phone.
 - Log loads in **pounds**.
@@ -42,7 +47,7 @@ Professional driver preparation inspires the balance of resistance training, cyc
 
 - Keep frequent actions, including Complete set, next-step controls, and numeric-entry confirmation, in the lower reachable area above the safe area and keyboard. Avoid repeated trips to top-corner buttons.
 - Use generously spaced touch targets, aiming for 48–56 point primary controls. Test comfortable reach with either hand on the actual phone.
-- Prefill from the approved target or previous comparable performance, but require explicit completion. Let the user tap to edit pounds/reps with a numeric keyboard. Never require typing unchanged values again.
+- Prefill repetitions and loads from the approved target or previous comparable performance, but require explicit completion. Duration and hold fields start at `0` under the later UI preference above. Let the user tap to edit pounds/reps with a numeric keyboard. Never require typing unchanged values again.
 - Keep the current set prominent, with previous performance and `lb / hand` readable without opening another screen. Avoid dense tables, tiny checkboxes, and horizontal scrolling.
 - Support quick undo for accidental taps. Do not make swipes, long presses, or precise dragging the only way to perform an essential action.
 - Health workout linking should need a clear confirmation, not manual entry of timestamps. Show Wednesday's strength and cycling recordings together while preserving their separate measurements.

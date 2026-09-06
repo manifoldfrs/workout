@@ -2,6 +2,16 @@
 
 Status: the first local logging preview. The [training brief](../product/motorsport-training-brief.md) remains the target specification, not a claim that every requirement is implemented.
 
+## UI refinements
+
+The app is named **Exercise Your Demons**. Its current programme is **Motorsport Strength & Stamina**. Display names do not change stored programme IDs, database names or the Expo slug.
+
+Duration and hold fields now start at `0` as an unrecorded draft. The existing positive-duration parser still rejects saving zero as completed work. Repetition fields retain prescribed targets and comparable loads remain available, without the explanatory prefill text. Empty exercise cues do not render a note. Cue edits affect new session snapshots, not historical prescriptions.
+
+The completed-session review previously always opened the early-finish dialog. The shared `endSession` handler now checks for pending work before choosing the existing finish command or omission confirmation. Keeping this decision in one handler prevents the review, summary and hour-limit actions from disagreeing. A real browser regression reproduced the unwanted dialog before the change and passed afterward. No new service, parser or persistence boundary was introduced.
+
+History no longer exposes manual backup/export/restore controls, following UI feedback. Existing service APIs and their SQLite tests remain intact. A user-facing recovery route still needs a decision before relying on this app for irreplaceable history.
+
 ## Selected runtime
 
 Direct dependency versions are pinned and `bun.lock` is committed. Expo's compatibility check passes for Expo 57.0.20, React Native 0.86.3, React 19.2.3 and Expo SQLite 57.0.2. TypeScript is 6.0.3. Effect and its Vitest integration are 4.0.0-rc.112, paired with Vitest 4.1.0.
@@ -36,7 +46,7 @@ The full prescription is copied into a session when it starts. Future template e
 
 The browser adapter uses local storage and Web Locks to serialize conditional saves across tabs. It reports an error when these APIs are unavailable. Browser data is separate from native SQLite and can be cleared by the browser. Neither is cloud backup or an encryption guarantee.
 
-Backups contain manually logged training only. Import parses the version, units, session identity, lifecycle consistency and modality before a replacement save. Restore requires explicit replacement confirmation and rejects a stale current revision. Restoring preserves training records but clears review-approval freshness so a pre-restore draft cannot be applied accidentally. Invalid data is not replaced with an empty journal. Recovering an already-corrupt native store through an in-app restore screen is not yet implemented, because ordinary restore requires a readable current revision and journal.
+Backups contain manually logged training only. Import parses the version, units, session identity, lifecycle consistency and modality before a replacement save. The restore service requires the caller's expected revision and rejects a stale current revision. Its former UI replacement confirmation has been removed along with the History backup controls. Restoring preserves training records but clears review-approval freshness so a pre-restore draft cannot be applied accidentally. Invalid data is not replaced with an empty journal. Recovering an already-corrupt native store through an in-app restore screen is not yet implemented, because ordinary restore requires a readable current revision and journal.
 
 The singleton journal is a deliberate first-version trade-off. Reads, writes and JSON import memory use scale with history size. Benchmark realistic multi-year history before long-term use. If a storage or import limit becomes necessary, it must not strand valid exported backups.
 
@@ -55,14 +65,14 @@ Friday's pre-start estimate currently displays the full three-set template even 
 - Formatting and strict TypeScript checks pass.
 - Effect/Vitest tests use the public workout service with the actual SQLite adapter and a real Node SQLite database. They cover all four programmes, modality/load-basis checks, undo, omissions, early finish, protected rest, timer expiry, duplicate commands, stale approval, JSON restore, corrupt data, rejected writes, revision conflicts, and reopening a database file.
 - Generated valid loads and repetitions exercise command parsing, duplicate-result invariance and JSON roundtrips. These fixtures are synthetic, not personal workout data.
-- Playwright exercises the real browser UI at 430 × 932. It covers logging with networking disabled after startup, reload recovery, optional rest recovery, undo, omissions, early finish, history, malformed/valid restore, simulated review acceptance, Friday's explicit choice, and refusal to reset corrupt browser data.
+- Playwright exercises the real browser UI at 430 × 932. It covers logging with networking disabled after startup, reload recovery, optional rest recovery, undo, omissions, early finish, completed-session review, history without backup controls, simulated review acceptance, Friday's explicit choice, and refusal to reset corrupt browser data. It also checks the app/programme names, zero-duration drafts, concise cues and empty, visually distinct resistance placeholders. Backup roundtrips remain covered through the public service with real SQLite.
 - The iOS production JavaScript/Hermes bundle exports successfully. No signed native binary or physical-device pass is claimed.
 - No module mocks or external AI calls are used.
 
 ## Remaining before relying on real history
 
 1. Run the Expo SQLite bridge on the target iPhone. Verify process termination, backgrounding, locked-screen timing, database errors, backup restore and upgrades. Node SQLite and a browser reload cannot prove these native behaviours.
-2. Validate Dynamic Type, VoiceOver, numeric keyboards, copy/paste backup usability and thumb reach on the physical phone. Browser screenshots only establish an initial layout.
+2. Validate Dynamic Type, VoiceOver, numeric keyboards and thumb reach on the physical phone. Browser screenshots only establish an initial layout. Decide on a recovery/export interface following removal of the manual backup controls.
 3. Add individual progressive warm-up set logging. The preview currently records warm-up as one preparation duration, never as working triples.
 4. Add calendar occurrences, move/skip behaviour and explicit weekend-day selection. Current recurring templates are manually started, not automatically scheduled.
 5. Add the remaining optional perceived-effort/talk-test/recovery fields, richer previous-performance context and deliberate interval guidance if wanted. No rest-adherence measurement or background alerts are claimed.

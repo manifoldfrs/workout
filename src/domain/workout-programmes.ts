@@ -103,12 +103,11 @@ function neck(): ReadonlyArray<SetPrescription> {
     rest: { min: index === 3 ? 0 : 20, max: index === 3 ? 0 : 30 },
     workEstimate: { min: 20, max: 30 },
     transition: { min: index === 3 ? 60 : 0, max: index === 3 ? 120 : 0 },
-    cue: "Controlled resistance. Stop for pain. No automatic resistance increases.",
+    cue: "Use steady pressure and stop if it hurts.",
   }))
 }
 
-const stretch = () =>
-  timed("Light stretching", "stretch", 300, 300, "cooldown", "Leave time to finish gently.")
+const stretch = () => timed("Light stretching", "stretch", 300, 300, "cooldown", "")
 const pullups = (count: number) =>
   reps("Pull-ups", {
     group: "pullup",
@@ -141,7 +140,7 @@ const monday: WorkoutProgramme = {
       max: 3,
       load: "total",
       rest: [150, 180],
-      cue: "Leave 1–2 good reps in reserve. No grinding. Total barbell load in pounds.",
+      cue: "Leave 1–2 good reps in reserve.",
     }),
     ...alternate(
       pullups(3),

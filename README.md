@@ -1,4 +1,4 @@
-# Workout
+# Exercise Your Demons
 
 A quiet, thumb-friendly iPhone workout log for driver conditioning, built with Expo, TypeScript, Effect and Bun.
 
@@ -17,13 +17,12 @@ Open the local address printed by Expo. `bun start` also starts native developme
 
 ## In this preview
 
-- Four programme templates, with an explicit Friday upper-body volume choice.
+- Motorsport Strength & Stamina, with four training-day templates and an explicit Friday upper-body volume choice.
 - Logging for loaded/bodyweight/assisted reps, carries in metres, neck holds and cycling phases.
 - Pounds with visible per-hand versus total load. No invented starting weights or personal history.
 - Preserved session prescriptions, undo, deliberate omissions and explicit early finishes.
 - SQLite on native, browser-local storage for the web preview, and restart recovery.
 - Optional rest timers and full-session time estimates, including setup, rest and stretching.
-- Local JSON backup and confirmed replacement restore.
 - A simulated seven-day review that can only recommend holding the programme steady. Acceptance checks the journal revision.
 
 ## Validate
@@ -42,7 +41,7 @@ Tests include real SQLite operations, failure recovery, generated roundtrips, an
 
 Physical iPhone testing, individual ramp-up set entries, calendar scheduling, richer workout feedback, HealthKit imports, real progression proposals and TestFlight. Warm-up is currently recorded as one preparation block. Browser startup needs the development server, it is not an offline-installable PWA.
 
-Do not rely on this preview as the only copy of real training history. Native restore, upgrades, keyboard reach, Dynamic Type and VoiceOver still need device checks.
+Do not rely on this preview as the only copy of real training history. Backup controls have been removed from History at the user's request. The tested export/restore service remains, but there is currently no in-app backup interface. Native recovery, upgrades, keyboard reach, Dynamic Type and VoiceOver still need device checks.
 
 ## Project notes
 

@@ -1,40 +1,20 @@
-import { useState } from "react"
-import { ScrollView, Text, TextInput, View } from "react-native"
+import { useState, type JSX } from "react"
+import { ScrollView, Text, View } from "react-native"
 import type { WorkoutJournal } from "../domain/workout-model"
 import { findWorkoutProgramme } from "../domain/workout-programmes"
 import { WorkoutSetHistory } from "./workout-history"
 import { WorkoutButton, styles } from "./workout-theme"
 
-/** History and deliberate backup replacement share the same local journal service. */
+/** History shows finished sessions without changing their saved prescriptions or results. */
 export function WorkoutHistoryScreen({
   journal,
-  busy,
-  exportBackup,
-  restoreBackup,
 }: {
   readonly journal: WorkoutJournal
-  readonly busy: boolean
-  readonly exportBackup: () => Promise<string | undefined>
-  readonly restoreBackup: (data: string) => Promise<boolean>
-}) {
+}): JSX.Element {
   const [expanded, setExpanded] = useState<string | undefined>()
-  const [backup, setBackup] = useState("")
-  const [restore, setRestore] = useState("")
-  const [confirmRestore, setConfirmRestore] = useState(false)
   const history = journal.sessions.filter((session) => session.state._tag === "finished").reverse()
-  async function showBackup() {
-    const data = await exportBackup()
-    if (data !== undefined) setBackup(data)
-  }
-  async function replaceBackup() {
-    if (await restoreBackup(restore)) {
-      setConfirmRestore(false)
-      setRestore("")
-      setBackup("")
-    }
-  }
   return (
-    <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.page}>
+    <ScrollView contentContainerStyle={styles.page}>
       <Text style={styles.eyebrow}>Your log</Text>
       <Text style={styles.title}>Work that adds up.</Text>
       <Text style={styles.body}>
@@ -85,69 +65,6 @@ export function WorkoutHistoryScreen({
           {expanded === session.id && <WorkoutSetHistory session={session} />}
         </View>
       ))}
-      <View style={styles.divider} />
-      <Text style={styles.heading}>Keep a copy.</Text>
-      <Text style={styles.body}>
-        Backups contain your manual training log. Keep them private, outside this public repository.
-        Browser previews use browser storage, the iPhone app uses SQLite. Neither is a cloud backup.
-      </Text>
-      <WorkoutButton
-        label="Show local backup"
-        variant="secondary"
-        onPress={() => {
-          void showBackup()
-        }}
-        disabled={busy}
-      />
-      {backup !== "" && (
-        <TextInput
-          accessibilityLabel="Local backup JSON"
-          multiline
-          editable={false}
-          selectTextOnFocus
-          value={backup}
-          style={[styles.input, { height: 180, fontSize: 12 }]}
-        />
-      )}
-      <Text style={styles.label}>Restore a backup</Text>
-      <TextInput
-        accessibilityLabel="Backup JSON to restore"
-        multiline
-        value={restore}
-        onChangeText={(value) => {
-          setRestore(value)
-          setConfirmRestore(false)
-        }}
-        placeholder="Paste your workout backup JSON"
-        style={[styles.input, { minHeight: 100, fontSize: 14 }]}
-      />
-      <WorkoutButton
-        label="Preview restore warning"
-        variant="secondary"
-        disabled={busy || restore.trim() === ""}
-        onPress={() => setConfirmRestore(true)}
-      />
-      {confirmRestore && (
-        <View style={styles.warning}>
-          <Text style={styles.label}>Replace the entire local log?</Text>
-          <Text style={styles.body}>
-            This replaces current history and any active session. Export the current log first.
-            Invalid backups will be rejected without changing it.
-          </Text>
-          <WorkoutButton
-            label="Replace local log with backup"
-            onPress={() => {
-              void replaceBackup()
-            }}
-            disabled={busy}
-          />
-          <WorkoutButton
-            label="Cancel restore"
-            variant="quiet"
-            onPress={() => setConfirmRestore(false)}
-          />
-        </View>
-      )}
     </ScrollView>
   )
 }

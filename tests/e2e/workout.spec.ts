@@ -1,5 +1,55 @@
 import { expect, test } from "@playwright/test"
 
+test("ending a reviewed complete session does not ask for an early-finish reason", async ({
+  page,
+}) => {
+  await page.goto("/")
+  await page.getByRole("button", { name: "View weekend workout" }).click()
+  await page.getByRole("button", { name: "Start weekend session" }).click()
+  for (const seconds of [300, 2400, 300]) {
+    await expect(page.getByLabel("Actual duration (seconds)")).toHaveValue("0")
+    await page.getByLabel("Actual duration (seconds)").fill(`${seconds}`)
+    await page.getByRole("button", { name: "Save completed work" }).click()
+  }
+  await page.getByRole("button", { name: "Review recorded sets" }).click()
+  await page.getByRole("button", { name: /^End session/ }).click()
+  await expect(page.getByText("Finish here?", { exact: true })).toHaveCount(0)
+  await page.getByRole("tab", { name: "History", exact: true }).click()
+  await expect(page.getByText(/Finished · .* min wall-clock/)).toBeVisible()
+})
+
+test("neck holds start at zero and resistance is an empty, faded placeholder", async ({ page }) => {
+  await page.goto("/")
+  await page.getByRole("button", { name: "View monday workout" }).click()
+  await expect(page.getByText("Leave time to finish gently.", { exact: true })).toHaveCount(0)
+  await expect(
+    page.getByText("Use steady pressure and stop if it hurts.", { exact: true }),
+  ).toBeVisible()
+  await page.getByRole("button", { name: "Start monday session" }).click()
+  for (let index = 0; index < 14; index++) {
+    await page.getByRole("button", { name: "Omit this set", exact: true }).click()
+    await page.getByRole("button", { name: "Planned volume choice", exact: true }).click()
+  }
+  const resistance = page.getByLabel("Resistance or device setting", { exact: true })
+  await expect(resistance).toHaveValue("")
+  await expect(resistance).toHaveAttribute("placeholder", "Describe resistance")
+  const colors = await resistance.evaluate((input) => ({
+    text: getComputedStyle(input).color,
+    placeholder: getComputedStyle(input, "::placeholder").color,
+  }))
+  expect(colors.placeholder).not.toBe(colors.text)
+  await expect(page.getByLabel("Actual duration (seconds)")).toHaveValue("0")
+  await expect(page.getByText(/Targets are prefilled|Last recorded load is prefilled/)).toHaveCount(
+    0,
+  )
+  await page.screenshot({ path: "test-results/neck-entry-iphone.png", fullPage: true })
+  await resistance.fill("Sample light manual resistance")
+  await page.getByLabel("Actual duration (seconds)").fill("20")
+  await page.getByRole("button", { name: "Save completed work" }).click()
+  await expect(page.getByText("Backward · working", { exact: true })).toBeVisible()
+  await expect(page.getByLabel("Actual duration (seconds)")).toHaveValue("0")
+})
+
 test("plan notes stay concise and relevant to each workout", async ({ page }) => {
   await page.goto("/")
   for (const { day, guidance } of [
@@ -34,7 +84,8 @@ test("the week screen keeps its wordmark without preview labels or filler copy",
 }) => {
   await page.clock.setFixedTime(new Date(2026, 8, 6, 12))
   await page.goto("/")
-  await expect(page.getByText("workout", { exact: true })).toBeVisible()
+  await expect(page.getByText("Exercise Your Demons", { exact: true })).toBeVisible()
+  await expect(page.getByText("Motorsport Strength & Stamina", { exact: true })).toBeVisible()
   await expect(page.getByRole("button", { name: /^View .* workout$/ })).toHaveCount(4)
   for (const text of [
     "●",
@@ -47,7 +98,7 @@ test("the week screen keeps its wordmark without preview labels or filler copy",
   }
 })
 
-test("offline logging survives reload and supports undo, omissions, review and backup restore", async ({
+test("offline logging survives reload and supports undo, omissions and review", async ({
   page,
   context,
 }) => {
@@ -58,10 +109,16 @@ test("offline logging survives reload and supports undo, omissions, review and b
   await page.screenshot({ path: "test-results/week-iphone.png", fullPage: true })
   await page.getByRole("button", { name: "View monday workout" }).click()
   await page.getByRole("button", { name: "Start monday session" }).click()
-  await expect(page.getByLabel("Actual duration (seconds)")).toHaveValue("420")
+  await expect(page.getByLabel("Actual duration (seconds)")).toHaveValue("0")
+  await page.getByRole("button", { name: "Save completed work" }).click()
+  await expect(page.getByRole("alert")).toContainText("Check the workout entry")
+  await expect(page.getByLabel("Actual duration (seconds)")).toHaveValue("0")
+  await page.getByLabel("Actual duration (seconds)").fill("420")
   await context.setOffline(true)
   await page.getByRole("button", { name: "Save completed work" }).click()
-  await expect(page.getByLabel("Actual repetitions")).toHaveValue("3")
+  await expect(page.getByLabel("Repetitions", { exact: true })).toHaveValue("3")
+  await expect(page.getByText("Leave 1–2 good reps in reserve.", { exact: true })).toBeVisible()
+  await expect(page.getByText(/Targets are prefilled|Total barbell load in pounds/)).toHaveCount(0)
   await page.getByRole("button", { name: "Save completed work" }).click()
   await expect(page.getByRole("alert")).toContainText("Check the workout entry")
   await page.getByLabel("Load (lb)", { exact: true }).fill("10")
@@ -82,21 +139,13 @@ test("offline logging survives reload and supports undo, omissions, review and b
   await page.getByRole("button", { name: "Omit this set", exact: true }).click()
   await page.getByRole("button", { name: "Time budget", exact: true }).click()
   await page.getByRole("button", { name: "Session log", exact: true }).click()
-  await page.getByRole("button", { name: "End session early", exact: true }).click()
+  await page.getByRole("button", { name: "End session", exact: true }).click()
   await page.getByRole("button", { name: "Quality declined", exact: true }).click()
   await page.getByRole("tab", { name: "History", exact: true }).click()
   await expect(page.getByText(/0 working sets recorded/)).toBeVisible()
-  await page.getByRole("button", { name: "Show local backup", exact: true }).click()
-  const backup = await page.getByLabel("Local backup JSON", { exact: true }).inputValue()
-  expect(backup).toContain('"formatVersion": 1')
-  await page.getByLabel("Backup JSON to restore", { exact: true }).fill("invalid")
-  await page.getByRole("button", { name: "Preview restore warning", exact: true }).click()
-  await page.getByRole("button", { name: "Replace local log with backup", exact: true }).click()
-  await expect(page.getByRole("alert")).toContainText("not valid JSON")
-  await page.getByLabel("Backup JSON to restore", { exact: true }).fill(backup)
-  await page.getByRole("button", { name: "Preview restore warning", exact: true }).click()
-  await page.getByRole("button", { name: "Replace local log with backup", exact: true }).click()
-  await expect(page.getByLabel("Backup JSON to restore", { exact: true })).toHaveValue("")
+  await expect(page.getByText("Keep a copy.", { exact: true })).toHaveCount(0)
+  await expect(page.getByText("Restore a backup", { exact: true })).toHaveCount(0)
+  await expect(page.getByRole("button", { name: "Show local backup", exact: true })).toHaveCount(0)
   await page.getByRole("tab", { name: "Review", exact: true }).click()
   await page.getByRole("button", { name: "Review the last seven days", exact: true }).click()
   await page.getByRole("button", { name: "Accept keep-steady review", exact: true }).click()

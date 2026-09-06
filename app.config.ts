@@ -2,7 +2,7 @@ import type { ExpoConfig } from "expo/config"
 
 /** Local app configuration contains no store identity or service credentials. */
 const workoutAppConfig: ExpoConfig = {
-  name: "Workout",
+  name: "Exercise Your Demons",
   slug: "workout",
   version: "0.1.0",
   orientation: "portrait",

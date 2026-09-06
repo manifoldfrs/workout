@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, type JSX } from "react"
 import { AppState, ScrollView, Text, View } from "react-native"
 import type { SetId, WorkoutJournal, WorkoutSession } from "../domain/workout-model"
 import { measurementFitsTarget } from "../domain/workout-model"
@@ -25,7 +25,7 @@ export function WorkoutSessionScreen({
   readonly busy: boolean
   readonly execute: (command: unknown) => Promise<boolean>
   readonly onBack: () => void
-}) {
+}): JSX.Element {
   const [now, setNow] = useState(Date.now())
   const [showLog, setShowLog] = useState(false)
   const [confirm, setConfirm] = useState<
@@ -64,6 +64,13 @@ export function WorkoutSessionScreen({
     : undefined
   const previous =
     previousSet?.outcome._tag === "performed" ? previousSet.outcome.measurement : undefined
+  async function endSession(): Promise<void> {
+    if (current) {
+      setConfirm({ _tag: "endEarly" })
+      return
+    }
+    await execute({ _tag: "finish", sessionId: session.id })
+  }
   async function endWithReason(reason: string) {
     if (!confirm) return
     const success = await execute({ ...confirm, sessionId: session.id, reason })
@@ -152,11 +159,7 @@ export function WorkoutSessionScreen({
           </Text>
         )}
         {budget.remainingSeconds === 0 && (
-          <WorkoutButton
-            label="Finish here"
-            onPress={() => setConfirm({ _tag: "endEarly" })}
-            disabled={busy}
-          />
+          <WorkoutButton label="Finish here" onPress={endSession} disabled={busy} />
         )}
         {session.restDeadline !== undefined ? (
           <WorkoutButton
@@ -213,12 +216,12 @@ export function WorkoutSessionScreen({
           <Text style={styles.body}>
             Remaining estimate: {Math.ceil(budget.estimatedRemaining.min / 60)}–
             {Math.ceil(budget.estimatedRemaining.max / 60)} min. Includes prescribed work, rest,
-            warm-up, stretching and assumed transitions. Actual setup can take longer.
+            warm-up, stretching and time between stations.
           </Text>
           <WorkoutButton
-            label="End session early"
+            label="End session"
             variant="secondary"
-            onPress={() => setConfirm({ _tag: "endEarly" })}
+            onPress={endSession}
             disabled={busy}
           />
         </ScrollView>
@@ -246,13 +249,7 @@ export function WorkoutSessionScreen({
           <Text style={styles.body}>
             All work is recorded or deliberately omitted. Finish to save the full session duration.
           </Text>
-          <WorkoutButton
-            label="Finish session"
-            disabled={busy}
-            onPress={() => {
-              void execute({ _tag: "finish", sessionId: session.id })
-            }}
-          />
+          <WorkoutButton label="End session" disabled={busy} onPress={endSession} />
           <WorkoutButton
             label="Review recorded sets"
             variant="secondary"
