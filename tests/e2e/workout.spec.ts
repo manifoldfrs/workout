@@ -1,5 +1,23 @@
 import { expect, test } from "@playwright/test"
 
+test("the week screen keeps its wordmark without preview labels or filler copy", async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(new Date(2026, 8, 6, 12))
+  await page.goto("/")
+  await expect(page.getByText("workout", { exact: true })).toBeVisible()
+  await expect(page.getByRole("button", { name: /^View .* workout$/ })).toHaveCount(4)
+  for (const text of [
+    "●",
+    "Local preview",
+    "Four purposeful sessions. Three real recovery days. One hour, including everything.",
+    "One easy ride this weekend. Keep the other day for recovery.",
+    "Small, repeatable work. A stronger foundation.",
+  ]) {
+    await expect(page.getByText(text, { exact: true })).toHaveCount(0)
+  }
+})
+
 test("offline logging survives reload and supports undo, omissions, review and backup restore", async ({
   page,
   context,
