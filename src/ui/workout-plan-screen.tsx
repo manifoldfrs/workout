@@ -31,26 +31,23 @@ export function WorkoutPlanScreen({
         <WorkoutButton label="Back to week" variant="quiet" onPress={onBack} />
         <Text style={styles.eyebrow}>{programme.day} · one hour maximum</Text>
         <Text style={styles.title}>{programme.title}</Text>
-        <Text style={styles.body}>
-          Warm-up, rest, transitions and stretching all count. Protect main-lift rest, not the
-          number of exercises.
-        </Text>
         <View style={estimate.max > 3600 ? styles.warning : styles.notice}>
           <Text style={styles.label}>
-            Estimated plan: {Math.ceil(estimate.min / 60)}–{Math.ceil(estimate.max / 60)} minutes
+            Estimated time: {Math.ceil(estimate.min / 60)}–{Math.ceil(estimate.max / 60)} minutes
           </Text>
           <Text style={styles.body}>
-            Includes warm-up, work, rest, stretching and setup assumptions. Lift sets are estimated
-            at 20–45 seconds and station changes at 1–2 minutes, including alternating exercises.
-            These allowances are separate from protected rest. This is not a measured or guaranteed
-            finish time.
+            {programme.id === "weekend"
+              ? "Includes your warm-up, ride, cooldown and 1–2 minutes for setup."
+              : "Includes warm-up, rest and stretching, with 20–45 seconds per lifting set and 1–2 minutes between stations."}
           </Text>
           {estimate.max > 3600 && (
             <Text style={styles.body}>
-              The full range exceeds the hour.{" "}
-              {programme.id === "wednesday"
-                ? "Review push-press and row omissions first, preserving cycling and neck."
-                : "Plan less optional work, never shorter main-lift rest."}
+              This could take more than an hour.{" "}
+              {programme.id === "weekend"
+                ? "Choose a shorter ride within the 40–50 minute range to leave time for setup and cooldown."
+                : programme.id === "wednesday"
+                  ? "Keep your full rest. If needed, skip push-press or row sets before bike or neck work."
+                  : "Keep your full rest and skip an accessory set if needed."}
             </Text>
           )}
         </View>

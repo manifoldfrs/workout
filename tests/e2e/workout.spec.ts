@@ -1,5 +1,34 @@
 import { expect, test } from "@playwright/test"
 
+test("plan notes stay concise and relevant to each workout", async ({ page }) => {
+  await page.goto("/")
+  for (const { day, guidance } of [
+    { day: "monday", guidance: "Keep your full rest and skip an accessory set if needed." },
+    {
+      day: "wednesday",
+      guidance:
+        "Keep your full rest. If needed, skip push-press or row sets before bike or neck work.",
+    },
+    {
+      day: "weekend",
+      guidance:
+        "Choose a shorter ride within the 40–50 minute range to leave time for setup and cooldown.",
+    },
+  ]) {
+    await page.getByRole("button", { name: `View ${day} workout` }).click()
+    await expect(page.getByText(/^Estimated time:/)).toBeVisible()
+    await expect(page.getByText(guidance, { exact: false })).toBeVisible()
+    await expect(page.getByText(/Protect main-lift rest, not the number of exercises/)).toHaveCount(
+      0,
+    )
+    await expect(
+      page.getByText(/setup assumptions|protected rest|guaranteed finish time/),
+    ).toHaveCount(0)
+    if (day === "weekend") await expect(page.getByText(/per lifting set/)).toHaveCount(0)
+    await page.getByRole("button", { name: "Back to week", exact: true }).click()
+  }
+})
+
 test("the week screen keeps its wordmark without preview labels or filler copy", async ({
   page,
 }) => {
