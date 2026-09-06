@@ -255,15 +255,15 @@ const friday: WorkoutProgramme = {
       cue: "Moderate-heavy, no grinders. Preserve rest between working sets.",
     }),
     ...alternate(
-      pullups(3),
+      pullups(2),
       reps("Dumbbell shoulder press", {
         group: "shoulder",
-        count: 3,
+        count: 2,
         min: 6,
         max: 8,
         load: "perHand",
         rest: [75, 90],
-        cue: "Two or three sets. Omit the third if choosing two today.",
+        cue: "",
       }),
       [60, 60],
     ),
@@ -304,7 +304,7 @@ const weekend: WorkoutProgramme = {
       rest: { min: 0, max: 0 },
       workEstimate: { min: 2400, max: 3000 },
       transition: { min: 60, max: 120 },
-      cue: "Easy enough to speak in complete sentences. Fifty minutes leaves no setup allowance within the hour.",
+      cue: "Aim for the BPM range marked Zone 2 on your Apple Watch, under Settings → Workout → Heart Rate Zones. Keep the pace easy enough to speak in complete sentences.",
     },
     timed(
       "Easy cooldown & stretch",

@@ -12,6 +12,12 @@ The completed-session review previously always opened the early-finish dialog. T
 
 History no longer exposes manual backup/export/restore controls, following UI feedback. Existing service APIs and their SQLite tests remain intact. A user-facing recovery route still needs a decision before relying on this app for irreplaceable history.
 
+Friday now prescribes two pull-up sets and two shoulder-press sets directly in the programme template. The start command no longer accepts a volume choice. Planning, time estimation and newly saved sessions all consume that same template. Existing session snapshots, including three-set Fridays, remain unchanged.
+
+Development-status banners have been removed from the workout, History and Review screens. The review remains a deterministic local summary, not connected AI. Implementation limitations belong here rather than in routine workout notes.
+
+The cycling cue points to the athlete's Zone 2 BPM range on their Watch, with the talk test as an effort guide. It does not calculate a personal range or claim access to Watch settings. Evidence-backed, adaptive exercise notes are a requirement for the later [Watch/AI integration](../research/apple-watch-integration.md#personalized-exercise-notes), not implemented personalization.
+
 ## Selected runtime
 
 Direct dependency versions are pinned and `bun.lock` is committed. Expo's compatibility check passes for Expo 57.0.20, React Native 0.86.3, React 19.2.3 and Expo SQLite 57.0.2. TypeScript is 6.0.3. Effect and its Vitest integration are 4.0.0-rc.112, paired with Vitest 4.1.0.
@@ -58,14 +64,14 @@ Outstanding prescribed recovery remains in the forecast even when the optional p
 
 The UI offers an explicit finish at the hour, but still accepts truthful records of work already performed. It does not demand stopping mid-repetition or discard overtime. Omissions need approval and show their approximate contribution to the remaining estimate. Wednesday prioritizes remaining push-press/row work before cycling or neck. Monday/Friday priorities stay undecided.
 
-Friday's pre-start estimate currently displays the full three-set template even after choosing two sets, so it is conservative rather than an exact two-set preview. Cable rotation records a completed left/right pair. Its timer stays unavailable until the rest scope is configured.
+Friday's pre-start estimate uses the same two-set prescription as the logger. Cable rotation records a completed left/right pair. Its timer stays unavailable until the rest scope is configured.
 
 ## Verification evidence
 
 - Formatting and strict TypeScript checks pass.
-- Effect/Vitest tests use the public workout service with the actual SQLite adapter and a real Node SQLite database. They cover all four programmes, modality/load-basis checks, undo, omissions, early finish, protected rest, timer expiry, duplicate commands, stale approval, JSON restore, corrupt data, rejected writes, revision conflicts, and reopening a database file.
+- Effect/Vitest tests use the public workout service with the actual SQLite adapter and a real Node SQLite database. They cover all four programmes, modality/load-basis checks, undo, omissions, early finish, protected rest, timer expiry, duplicate commands, stale approval, JSON restore, corrupt data, rejected writes, revision conflicts, reopening a database file, and preserving saved three-set Friday sessions while new sessions use two sets.
 - Generated valid loads and repetitions exercise command parsing, duplicate-result invariance and JSON roundtrips. These fixtures are synthetic, not personal workout data.
-- Playwright exercises the real browser UI at 430 × 932. It covers logging with networking disabled after startup, reload recovery, optional rest recovery, undo, omissions, early finish, completed-session review, history without backup controls, simulated review acceptance, Friday's explicit choice, and refusal to reset corrupt browser data. It also checks the app/programme names, zero-duration drafts, concise cues and empty, visually distinct resistance placeholders. Backup roundtrips remain covered through the public service with real SQLite.
+- Playwright exercises the real browser UI at 430 × 932. It covers logging with networking disabled after startup, reload recovery, optional rest recovery, undo, omissions, early finish, completed-session review, history without backup controls, simulated review acceptance, Friday's immediate two-set start and reload recovery, and refusal to reset corrupt browser data. It also checks the app/programme names, zero-duration drafts, concise cues and empty, visually distinct resistance placeholders. Backup roundtrips remain covered through the public service with real SQLite.
 - The iOS production JavaScript/Hermes bundle exports successfully. No signed native binary or physical-device pass is claimed.
 - No module mocks or external AI calls are used.
 

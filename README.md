@@ -17,7 +17,7 @@ Open the local address printed by Expo. `bun start` also starts native developme
 
 ## In this preview
 
-- Motorsport Strength & Stamina, with four training-day templates and an explicit Friday upper-body volume choice.
+- Motorsport Strength & Stamina, with four training-day templates and two upper-body sets per exercise on Friday.
 - Logging for loaded/bodyweight/assisted reps, carries in metres, neck holds and cycling phases.
 - Pounds with visible per-hand versus total load. No invented starting weights or personal history.
 - Preserved session prescriptions, undo, deliberate omissions and explicit early finishes.

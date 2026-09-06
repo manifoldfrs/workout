@@ -19,7 +19,6 @@ export const WorkoutCommand = Schema.TaggedUnion({
   start: {
     sessionId: SessionId,
     programmeId: ProgrammeId,
-    upperBodySets: Schema.optionalKey(Schema.Literals([2, 3])),
   },
   record: {
     sessionId: SessionId,
@@ -79,16 +78,6 @@ function startSession(
     return failure("Resume or finish your current session first.")
   const programme = findWorkoutProgramme(command.programmeId)
   if (!programme) return failure("This workout programme is unavailable.")
-  if (programme.id === "friday" && command.upperBodySets === undefined)
-    return failure("Choose two or three upper-body sets for Friday.")
-  const sets = programme.sets.filter(
-    (set) =>
-      !(
-        programme.id === "friday" &&
-        command.upperBodySets === 2 &&
-        (set.id === "pullup-3" || set.id === "shoulder-3")
-      ),
-  )
   return Effect.succeed({
     ...journal,
     sessions: [
@@ -98,7 +87,10 @@ function startSession(
         programmeId: programme.id,
         startedAt: now,
         state: { _tag: "active" as const },
-        sets: sets.map((prescription) => ({ prescription, outcome: { _tag: "pending" as const } })),
+        sets: programme.sets.map((prescription) => ({
+          prescription,
+          outcome: { _tag: "pending" as const },
+        })),
       },
     ],
   })

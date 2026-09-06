@@ -17,15 +17,10 @@ export function WorkoutHistoryScreen({
     <ScrollView contentContainerStyle={styles.page}>
       <Text style={styles.eyebrow}>Your log</Text>
       <Text style={styles.title}>Work that adds up.</Text>
-      <Text style={styles.body}>
-        Only work you record appears here. No estimated Watch sets or imported health data.
-      </Text>
       {history.length === 0 && (
         <View style={styles.card}>
           <Text style={styles.heading}>A clean start.</Text>
-          <Text style={styles.body}>
-            Your finished sessions will appear here. There is no sample history mixed into your log.
-          </Text>
+          <Text style={styles.body}>Your finished sessions will appear here.</Text>
         </View>
       )}
       {history.map((session) => (

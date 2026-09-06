@@ -53,6 +53,22 @@ For the user's current activity labels:
 
 Apple's [workout mirroring API][mirroring] connects a developer's own watchOS app to its companion iOS app. It is not documented as a way to attach to Apple's Workout app. A custom Watch app would be a separate scope and native-development decision, not a prerequisite for reading saved workouts.
 
+## Personalized exercise notes
+
+Confirmed direction from UI feedback: exercise notes should become specific to the athlete as linked Watch metrics and recorded workout results accumulate. This remains unimplemented. The current cycling cue uses the Watch's displayed Zone 2 range without inventing a numeric target.
+
+Apple documents personalized, estimated heart-rate zones and a Heart Rate Zone workout view. Settings on the Watch are under Workout → Heart Rate Zones. Automatic zones require a date of birth in Health. These estimates do not establish a laboratory-measured physiological zone. See [Apple's Heart Rate Zones guide](https://support.apple.com/guide/watch/view-heart-rate-zones-apd897dccddf/watchos).
+
+Before enabling personalized notes:
+
+- Combine matched cycling measurements with actual session outcomes. Strength repetitions, sets, loads, omissions and quality remain manually recorded evidence, not inferred from heart rate.
+- Keep source, observation date and measurement coverage with the evidence. Missing or stale samples stay unknown. Do not claim a workout met its heart-rate target from an average or elapsed time alone.
+- Verify whether the chosen native API exposes the athlete's configured zone boundaries. Heart-rate samples alone do not reveal those settings. If unavailable, obtain a confirmed range or separately agreed calculation basis rather than inventing defaults.
+- Generate short, exercise-specific guidance with an inspectable reason. Generic cues remain available without fabricated personal metrics when Health data or AI is unavailable.
+- Apply existing approval and safety constraints whenever a note proposes changing load, volume, rest or schedule. Preserve guidance already saved in session prescriptions.
+- Follow the separate health-data sharing consent, minimization and provider-policy checks below before sending any imported measurements to AI. Asking for personalized notes does not itself enable a remote data-sharing path.
+- Validate with a physical device and real authorized measurements before claiming personalized BPM guidance works. Test missing zones, missing samples, mismatched recordings and unavailable AI through the same public interfaces.
+
 ## Match the recording without duplicating work
 
 Suggested experience after a session: “Found Functional Strength Training around the time of your Monday workout. Link it?” Show the recorded times and duration so the user can recognise it.

@@ -83,8 +83,9 @@ Ranges are intentional. Do not silently select a count, load, or rest duration w
 
 - Dynamic warm-up: about 7–8 min total, including easy bike, leg swings, walking lunges, bodyweight squats, shoulder mobility, and progressive front squat warm-up sets.
 - Front squat: 4 × 4, resting 2.5–3 min between each working set. Moderate-heavy, no grinders.
-- Pull-ups: 2–3 × 6–8.
-- Dumbbell shoulder press: 2–3 × 6–8.
+- Pull-ups: 2 × 6–8.
+- Dumbbell shoulder press: 2 × 6–8.
+- Two sets are fixed for the current programme. Do not ask for a pre-session volume choice. Reassess volume for a future approved programme using actual results.
 - Alternate pull-ups and shoulder press, resting about 60 sec after each exercise.
 - Seated cable rotation: 2 × 10 per side, resting about 45–60 sec. Confirm whether this rest follows each side or each left/right pair before instantiating its timer sequence.
 - Neck: one round, 20–30 sec per direction, resting 20–30 sec between directions.
@@ -94,7 +95,7 @@ Ranges are intentional. Do not silently select a count, load, or rest duration w
 
 - Stationary bike, no intervals.
 - Easy warm-up: 5 min.
-- Zone 2: 40–50 min, easy enough to speak in complete sentences.
+- Zone 2: 40–50 min. Aim for the Zone 2 BPM range shown on the athlete's Apple Watch and keep the pace easy enough to speak in complete sentences. Do not substitute a generic BPM range for an unknown personal target.
 - Easy cooldown/stretching: 5 min.
 - Record actual duration, optional measured heart rate, perceived effort, and an optional talk-test observation. Do not invent a heart-rate zone or infer physiological Zone 2 from elapsed time alone.
 
@@ -146,6 +147,12 @@ Update under consideration: the user already records with Apple Watch and may no
 
 ## Progression and weekly review
 
+### Personalized exercise notes
+
+Routine workout notes should be useful coaching, without local-preview or development-status messages. Future AI-generated notes should use linked Watch metrics alongside actual loads, completed repetitions and sets, omissions, and explicit quality/effort reports. Describe what the evidence supports rather than claiming the app learned something from missing measurements. Notes that change a prescription require review and approval for future training, not silent changes to an active or historical session.
+
+Zone 2 guidance should show a personal BPM range only when its source and calculation basis are known. Watch zone settings are not assumed to be exposed by HealthKit. Until an approved range is available, direct the athlete to the Watch's range and use conversational effort. The current app does not import Watch metrics or generate AI notes. The [Watch integration plan](../research/apple-watch-integration.md#personalized-exercise-notes) records the remaining evidence, consent and device checks.
+
 ### Strength
 
 Protect technically clean reps and generally 1–2 reps in reserve. No training-to-failure target for main lifts. Increases are gradual and constrained by real available increments. Exact increment and repeated-success rules remain to be agreed, not invented from generic gym defaults.
@@ -195,6 +202,6 @@ AI receives the governing time/rest/quality constraints with the review packet. 
 - Monday and Friday accessory omission order. Wednesday's upper-body pair is confirmed as lower priority than cycling and neck when time runs short.
 - Current working weights and available equipment increments, pull-up assistance/added-load mode, and carry load basis.
 - Neck device/resistance scale and progression guidance. Directions, initial round count, and hold/rest ranges are now known.
-- Exact preferred timer values within ranges, Friday's 2–3 set choice, and cable-rotation rest after each side versus after both sides.
+- Exact preferred timer values within ranges and cable-rotation rest after each side versus after both sides.
 - Preferred weekend day and actual warm-up/setup timings. No guarantee that every exercise listed fits every session until timing is evaluated.
-- Backend authentication, model, spending limit, and retention, plus app naming, Apple Developer access, and the design screenshot.
+- Backend authentication, model, spending limit, and retention, plus Apple Developer access.

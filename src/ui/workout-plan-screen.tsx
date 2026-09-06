@@ -1,11 +1,11 @@
-import { useState, type JSX } from "react"
+import type { JSX } from "react"
 import { ScrollView, Text, View } from "react-native"
 import type { ProgrammeId, SetPrescription } from "../domain/workout-model"
 import { formatSetTarget, type WorkoutProgramme } from "../domain/workout-programmes"
 import { estimateWorkoutDuration } from "../domain/workout-review"
 import { WorkoutButton, styles } from "./workout-theme"
 
-/** Planning keeps Friday's volume undecided until the athlete chooses it. */
+/** The plan and time estimate use the same prescription that will be saved at session start. */
 export function WorkoutPlanScreen({
   programme,
   busy,
@@ -15,9 +15,8 @@ export function WorkoutPlanScreen({
   readonly programme: WorkoutProgramme
   readonly busy: boolean
   readonly onBack: () => void
-  readonly onStart: (programmeId: ProgrammeId, upperBodySets: 2 | 3 | undefined) => void
+  readonly onStart: (programmeId: ProgrammeId) => void
 }): JSX.Element {
-  const [upperBodySets, setUpperBodySets] = useState<2 | 3 | undefined>()
   const groups = new Map<string, Array<SetPrescription>>()
   for (const set of programme.sets) {
     const group = groups.get(set.exercise)
@@ -54,53 +53,29 @@ export function WorkoutPlanScreen({
         {programme.id === "wednesday" && (
           <View style={styles.notice}>
             <Text style={styles.label}>Two Watch recordings, one session</Text>
-            <Text style={styles.body}>
-              Use Functional Strength Training, then Indoor Cycling. Watch imports are not connected
-              in this local preview.
-            </Text>
+            <Text style={styles.body}>Use Functional Strength Training, then Indoor Cycling.</Text>
           </View>
         )}
         {[...groups.values()].map((sets) => {
           const set = sets[0]
           if (!set) return undefined
-          const count =
-            programme.id === "friday" && (set.group === "pullup" || set.group === "shoulder")
-              ? "2–3"
-              : sets.length
           return (
             <View key={set.id} style={styles.card}>
               <Text style={styles.label}>{set.exercise}</Text>
               <Text style={styles.body}>
-                {count} × {formatSetTarget(set.target)}
+                {sets.length} × {formatSetTarget(set.target)}
                 {set.rest.max > 0 ? ` · ${set.rest.min}–${set.rest.max} sec rest` : ""}
               </Text>
               {set.cue !== "" && <Text style={styles.body}>{set.cue}</Text>}
             </View>
           )
         })}
-        {programme.id === "friday" && (
-          <View style={{ gap: 12 }}>
-            <Text style={styles.label}>Choose upper-body sets before starting</Text>
-            <View style={styles.row}>
-              <WorkoutButton
-                label={upperBodySets === 2 ? "✓ Two sets" : "Two sets"}
-                variant="secondary"
-                onPress={() => setUpperBodySets(2)}
-              />
-              <WorkoutButton
-                label={upperBodySets === 3 ? "✓ Three sets" : "Three sets"}
-                variant="secondary"
-                onPress={() => setUpperBodySets(3)}
-              />
-            </View>
-          </View>
-        )}
       </ScrollView>
       <View style={styles.footer}>
         <WorkoutButton
           label={`Start ${programme.day.toLowerCase()} session`}
-          disabled={busy || (programme.id === "friday" && upperBodySets === undefined)}
-          onPress={() => onStart(programme.id, upperBodySets)}
+          disabled={busy}
+          onPress={() => onStart(programme.id)}
         />
         <Text style={[styles.body, { textAlign: "center" }]}>
           Start when setup begins. The hour includes everything.

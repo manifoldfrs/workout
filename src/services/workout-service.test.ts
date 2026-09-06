@@ -134,7 +134,6 @@ describe("local workout service with real SQLite", () => {
           _tag: "start",
           sessionId,
           programmeId: programme.id,
-          upperBodySets: 2,
         })
         const current = started.sessions.find((entry) => entry.id === sessionId)
         if (!current) throw new Error("Test expected the started session")
@@ -299,23 +298,23 @@ describe("local workout service with real SQLite", () => {
     }),
   )
 
-  it.effect("rejects stale reviews and requires an explicit Friday volume choice", () =>
+  it.effect("starts Friday's two-set prescription and rejects stale reviews", () =>
     Effect.gen(function* () {
       const { service } = yield* fixture
-      expect(
-        (yield* Effect.result(
-          service.execute({ _tag: "start", sessionId: "sample", programmeId: "friday" }),
-        ))._tag,
-      ).toBe("Failure")
       const started = yield* service.execute({
         _tag: "start",
         sessionId: "sample",
         programmeId: "friday",
-        upperBodySets: 2,
       })
-      expect(
-        session(started).sets.filter((set) => set.prescription.group === "pullup"),
-      ).toHaveLength(2)
+      for (const group of ["pullup", "shoulder"]) {
+        expect(
+          session(started).sets.filter((set) => set.prescription.group === group),
+        ).toHaveLength(2)
+      }
+      const friday = workoutProgrammes.find((programme) => programme.id === "friday")
+      if (!friday) throw new Error("Test expected Friday's programme")
+      expect(session(started).sets.map((set) => set.prescription)).toEqual(friday.sets)
+      expect(yield* service.load()).toEqual(started)
       yield* service.execute({
         _tag: "endEarly",
         sessionId: "sample",
@@ -326,6 +325,62 @@ describe("local workout service with real SQLite", () => {
           service.execute({ _tag: "approveReview", revision: started.revision }),
         ))._tag,
       ).toBe("Failure")
+    }),
+  )
+
+  it.effect("preserves saved three-set Friday sessions when starting the two-set programme", () =>
+    Effect.gen(function* () {
+      const { service } = yield* fixture
+      const started = yield* service.execute({
+        _tag: "start",
+        sessionId: "previous-friday",
+        programmeId: "friday",
+      })
+      const current = session(started)
+      const thirdSets = current.sets
+        .filter((set) => set.prescription.id === "pullup-2" || set.prescription.id === "shoulder-2")
+        .map((set) => ({
+          ...set,
+          prescription: {
+            ...set.prescription,
+            id: set.prescription.id.replace("-2", "-3"),
+            label: "Set 3",
+          },
+        }))
+      const previous = {
+        ...started,
+        sessions: [
+          {
+            ...current,
+            sets: current.sets.flatMap((set) =>
+              set.prescription.id === "shoulder-2" ? [set, ...thirdSets] : [set],
+            ),
+          },
+        ],
+      }
+      const restored = yield* service.restoreBackup(JSON.stringify(previous), started.revision)
+      for (const group of ["pullup", "shoulder"]) {
+        expect(
+          session(restored).sets.filter((set) => set.prescription.group === group),
+        ).toHaveLength(3)
+      }
+      const finished = yield* service.execute({
+        _tag: "endEarly",
+        sessionId: "previous-friday",
+        reason: "Sample previous programme",
+      })
+      const next = yield* service.execute({
+        _tag: "start",
+        sessionId: "next-friday",
+        programmeId: "friday",
+      })
+      expect(session(next)).toEqual(session(finished))
+      const latest = next.sessions.find((entry) => entry.id === "next-friday")
+      if (!latest) throw new Error("Test expected the new Friday session")
+      for (const group of ["pullup", "shoulder"]) {
+        expect(latest.sets.filter((set) => set.prescription.group === group)).toHaveLength(2)
+      }
+      expect(yield* service.load()).toEqual(next)
     }),
   )
 

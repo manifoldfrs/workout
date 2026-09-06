@@ -91,12 +91,11 @@ export function WorkoutApp(): JSX.Element {
     setState({ _tag: "ready", journal })
     return true
   }
-  async function start(programmeId: ProgrammeId, upperBodySets: 2 | 3 | undefined) {
+  async function start(programmeId: ProgrammeId) {
     const success = await execute({
       _tag: "start",
       programmeId,
       sessionId: `${programmeId}-${Date.now()}`,
-      ...(upperBodySets === undefined ? {} : { upperBodySets }),
     })
     if (success) {
       setSelected(undefined)
@@ -147,9 +146,7 @@ export function WorkoutApp(): JSX.Element {
           programme={programme}
           busy={busy}
           onBack={() => setSelected(undefined)}
-          onStart={(id, count) => {
-            void start(id, count)
-          }}
+          onStart={start}
         />
       )
     switch (tab) {

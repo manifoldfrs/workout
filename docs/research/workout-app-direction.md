@@ -125,7 +125,7 @@ Clarify before making a fully runnable template:
 - Available load increments and the basis for non-dumbbell carry loads. Pounds and per-hand dumbbells are already confirmed.
 - Pull-ups: bodyweight, added weight, or assistance.
 - Neck device/resistance scale and appropriate progression guidance. Directions and initial hold/rest ranges are now specified in the product brief.
-- How you choose within the Friday 2–3 set range and the prescribed rest ranges. The interface can show the range until you choose a timer value.
+- Friday volume is now settled at two sets per upper-body exercise for the current programme, superseding the original 2–3 range above. Prescribed rest-range choices remain to be resolved.
 - Preferred weekend day, baseline loads, and any relevant limitations.
 
 These missing details should not prevent us from prototyping the logging interface with clearly labelled illustrative data.

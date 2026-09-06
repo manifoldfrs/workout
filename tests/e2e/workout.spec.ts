@@ -7,6 +7,8 @@ test("ending a reviewed complete session does not ask for an early-finish reason
   await page.getByRole("button", { name: "View weekend workout" }).click()
   await page.getByRole("button", { name: "Start weekend session" }).click()
   for (const seconds of [300, 2400, 300]) {
+    if (seconds === 2400)
+      await expect(page.getByText(/BPM range marked Zone 2 on your Apple Watch/)).toBeVisible()
     await expect(page.getByLabel("Actual duration (seconds)")).toHaveValue("0")
     await page.getByLabel("Actual duration (seconds)").fill(`${seconds}`)
     await page.getByRole("button", { name: "Save completed work" }).click()
@@ -74,7 +76,12 @@ test("plan notes stay concise and relevant to each workout", async ({ page }) =>
     await expect(
       page.getByText(/setup assumptions|protected rest|guaranteed finish time/),
     ).toHaveCount(0)
-    if (day === "weekend") await expect(page.getByText(/per lifting set/)).toHaveCount(0)
+    await expect(page.getByText(/local preview|not connected|come later/i)).toHaveCount(0)
+    if (day === "weekend") {
+      await expect(page.getByText(/per lifting set/)).toHaveCount(0)
+      await expect(page.getByText(/BPM range marked Zone 2 on your Apple Watch/)).toBeVisible()
+      await expect(page.getByText(/Fifty minutes leaves no setup allowance/)).toHaveCount(0)
+    }
     await page.getByRole("button", { name: "Back to week", exact: true }).click()
   }
 })
@@ -143,11 +150,13 @@ test("offline logging survives reload and supports undo, omissions and review", 
   await page.getByRole("button", { name: "Quality declined", exact: true }).click()
   await page.getByRole("tab", { name: "History", exact: true }).click()
   await expect(page.getByText(/0 working sets recorded/)).toBeVisible()
+  await expect(page.getByText(/preview|sample history|imported health data/i)).toHaveCount(0)
   await expect(page.getByText("Keep a copy.", { exact: true })).toHaveCount(0)
   await expect(page.getByText("Restore a backup", { exact: true })).toHaveCount(0)
   await expect(page.getByRole("button", { name: "Show local backup", exact: true })).toHaveCount(0)
   await page.getByRole("tab", { name: "Review", exact: true }).click()
   await page.getByRole("button", { name: "Review the last seven days", exact: true }).click()
+  await expect(page.getByText(/preview|simulation|come later|not connected/i)).toHaveCount(0)
   await page.getByRole("button", { name: "Accept keep-steady review", exact: true }).click()
   await expect(
     page.getByText("Accepted and saved. Programme unchanged.", { exact: true }),
@@ -155,12 +164,27 @@ test("offline logging survives reload and supports undo, omissions and review", 
   expect(errors).toEqual([])
 })
 
-test("Friday requires a volume choice and corrupt storage is never reset", async ({ page }) => {
+test("Friday starts with two upper-body sets without a volume choice", async ({ page }) => {
   await page.goto("/")
   await page.getByRole("button", { name: "View friday workout" }).click()
-  await expect(page.getByRole("button", { name: "Start friday session" })).toBeDisabled()
-  await page.getByRole("button", { name: "Two sets", exact: true }).click()
   await expect(page.getByRole("button", { name: "Start friday session" })).toBeEnabled()
+  await expect(page.getByText("Choose upper-body sets before starting")).toHaveCount(0)
+  await expect(page.getByRole("button", { name: /Two sets|Three sets/ })).toHaveCount(0)
+  await expect(page.getByText(/^2 × 6–8 reps/)).toHaveCount(2)
+  await page.getByRole("button", { name: "Start friday session" }).click()
+  await page.getByRole("button", { name: "Session log", exact: true }).click()
+  await expect(page.getByText("Pull-ups", { exact: true })).toHaveCount(2)
+  await expect(page.getByText("Dumbbell shoulder press", { exact: true })).toHaveCount(2)
+  await page.reload()
+  await page.getByRole("button", { name: "Resume session" }).click()
+  await page.getByRole("button", { name: "Session log", exact: true }).click()
+  await expect(page.getByText("Pull-ups", { exact: true })).toHaveCount(2)
+  await expect(page.getByText("Dumbbell shoulder press", { exact: true })).toHaveCount(2)
+})
+
+test("corrupt storage is never reset", async ({ page }) => {
+  await page.goto("/")
+  await expect(page.getByRole("button", { name: "View friday workout" })).toBeVisible()
   await page.evaluate(() => localStorage.setItem("workout.journal.v1", "broken"))
   await page.reload()
   await expect(page.getByRole("alert")).toContainText("saved browser log is invalid")
