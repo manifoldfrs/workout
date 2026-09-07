@@ -45,6 +45,7 @@ Do not rely on this preview as the only copy of real training history. Backup co
 
 ## Project notes
 
+- [Resume work: prioritized next steps](docs/development/next-steps.md)
 - [Local implementation and remaining checks](docs/development/local-app.md)
 - [Governing training brief](docs/product/motorsport-training-brief.md)
 - [Apple Watch integration proposal](docs/research/apple-watch-integration.md)
